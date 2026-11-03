@@ -38,7 +38,7 @@ python3 tests/integration.py --execute --image strongswan-ikev1:test
 
 The integration harness tests IKEv1 and IKEv2 with PSK authentication, AES-256/SHA-256/ECP-384, NAT-T on UDP/4500, protected traffic in both directions, CHILD_SA rekeying and IKE reauthentication. It also checks default startup and automatic configuration loading. Failures produce sanitized diagnostics in the job log and summary.
 
-Pushes to `master`, pull requests, manual runs and the weekly schedule trigger CI. After successful tests, runs on `master` publish amd64 and arm64 images to GHCR. Pull requests only build and test. Published tags are `master` and the upstream version from the Dockerfile, currently `6.1.0`.
+Pushes to `master`, pull requests, manual runs and the weekly schedule trigger CI. After successful tests, Docker's [GitHub Builder](https://docs.docker.com/build/ci/github-actions/multi-platform/#distribute-build-across-multiple-runners) builds on native amd64 and arm64 runners and publishes the combined image to GHCR. Pull requests only build and test. Published tags are `master` and the upstream version from the Dockerfile, currently `6.1.0`.
 
 Weekly and manual rebuilds bypass the build cache, pull the Ubuntu base and install available package updates. Both tags are mutable; pin an image digest for reproducible deployments. OCI labels record the source repository, Git revision and upstream version.
 

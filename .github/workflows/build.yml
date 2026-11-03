@@ -21,8 +21,17 @@ env:
 jobs:
   test:
     runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.value }}
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+      - name: Read upstream version
+        id: version
+        shell: bash
+        run: |
+          version=$(sed -nE 's/^ENV VERSION="?([0-9]+\.[0-9]+\.[0-9]+)"?\s*$/\1/p' Dockerfile)
+          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          echo "value=$version" >> "$GITHUB_OUTPUT"
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - name: Build test image
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
@@ -62,42 +71,32 @@ jobs:
   publish:
     needs: test
     if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
+    uses: docker/github-builder/.github/workflows/build.yml@cbc9d42f8c89a55623392aadd03600965b80e963 # v1
     permissions:
       contents: read
       packages: write
-    steps:
-      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-      - name: Read upstream version
-        id: version
-        shell: bash
-        run: |
-          version=$(sed -nE 's/^ENV VERSION="?([0-9]+\.[0-9]+\.[0-9]+)"?\s*$/\1/p' Dockerfile)
-          [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          echo "value=$version" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4
-      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
-      - uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4
-        with:
-          registry: ghcr.io
+      id-token: write
+    with:
+      output: image
+      push: true
+      platforms: linux/amd64,linux/arm64
+      distribute: true
+      runner: |
+        default=ubuntu-24.04
+        linux/arm64=ubuntu-24.04-arm
+      cache: false
+      meta-images: ghcr.io/brick4u/strongswan-ikev1
+      meta-tags: |
+        type=raw,value=${{ needs.test.outputs.version }}
+        type=raw,value=master
+      meta-flavor: latest=false
+      set-meta-labels: true
+      labels: |
+        org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+        org.opencontainers.image.revision=${{ github.sha }}
+        org.opencontainers.image.version=${{ needs.test.outputs.version }}
+    secrets:
+      registry-auths: |
+        - registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Publish multi-platform image
-        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
-        with:
-          context: .
-          platforms: linux/amd64,linux/arm64
-          push: true
-          pull: true
-          no-cache: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
-          tags: |
-            ${{ env.IMAGE }}:master
-            ${{ env.IMAGE }}:${{ steps.version.outputs.value }}
-          labels: |
-            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
-            org.opencontainers.image.revision=${{ github.sha }}
-            org.opencontainers.image.version=${{ steps.version.outputs.value }}
-          cache-from: |
-            type=gha,scope=multi-platform
-            type=gha,scope=amd64-test
-          cache-to: type=gha,mode=max,scope=multi-platform
