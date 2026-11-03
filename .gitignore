@@ -1,0 +1,32 @@
+# Local configuration and documentation
+.env
+.env.*
+*.local
+*.local.*
+local/
+private/
+_internal_docs/
+
+# Credentials and key material
+keys/
+secrets/
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+
+# Python and editor state
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.idea/
+.vscode/
+*~
+*.swp
+.DS_Store
+
+# Local test output
+*.log
+coverage/
