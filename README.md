@@ -6,7 +6,7 @@ Ubuntu 26.04 with strongSwan 6.1.0, built from the SHA-256-pinned upstream relea
 
 ## Run
 
-Prepare your connection definitions and credentials in a local `swanctl/` directory, following the [swanctl configuration reference](https://docs.strongswan.org/docs/latest/swanctl/swanctlConf.html). Set `version = 1` for IKEv1 or `version = 2` for IKEv2 in each connection.
+Prepare your connection definitions and credentials in the git-ignored local `swanctl/` directory, following the [swanctl configuration reference](https://docs.strongswan.org/docs/latest/swanctl/swanctlConf.html). Set `version = 1` for IKEv1 or `version = 2` for IKEv2 in each connection.
 
 ```sh
 docker run -d --name strongswan \

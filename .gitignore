@@ -4,6 +4,7 @@
 *.local
 *.local.*
 local/
+/swanctl/
 private/
 _internal_docs/
 
