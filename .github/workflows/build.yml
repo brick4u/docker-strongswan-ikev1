@@ -31,6 +31,7 @@ jobs:
           platforms: linux/amd64
           load: true
           pull: true
+          no-cache: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
           tags: strongswan-ikev1:test
           cache-from: type=gha,scope=amd64-test
           cache-to: type=gha,mode=max,scope=amd64-test
@@ -88,6 +89,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           pull: true
+          no-cache: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
           tags: |
             ${{ env.IMAGE }}:master
             ${{ env.IMAGE }}:${{ steps.version.outputs.value }}

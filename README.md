@@ -40,7 +40,7 @@ The integration harness tests IKEv1 and IKEv2 with PSK authentication, AES-256/S
 
 Pushes to `master`, pull requests, manual runs and the weekly schedule trigger CI. After successful tests, runs on `master` publish amd64 and arm64 images to GHCR. Pull requests only build and test. Published tags are `master` and the upstream version from the Dockerfile, currently `6.1.0`.
 
-Weekly rebuilds pull the Ubuntu base and refresh its package updates. Both tags are mutable; pin an image digest for reproducible deployments. OCI labels record the source repository, Git revision and upstream version.
+Weekly and manual rebuilds bypass the build cache, pull the Ubuntu base and install available package updates. Both tags are mutable; pin an image digest for reproducible deployments. OCI labels record the source repository, Git revision and upstream version.
 
 ## Source and licensing
 

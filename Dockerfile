@@ -8,6 +8,7 @@ RUN \
   # install packages
   DEV_PACKAGES="wget bzip2 make gcc libssl-dev pkg-config" && \
   apt-get -y update && \
+  apt-get -y upgrade && \
   apt-get -y install ca-certificates openssl iproute2 iputils-ping nano $DEV_PACKAGES && \
   \
   # download and build strongSwan IKEv1/IKEv2 daemon
